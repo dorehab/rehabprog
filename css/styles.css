@@ -1,0 +1,22 @@
+/* DoRehab Indonesia — Warm Clinical & Athletic Editorial Theme */
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: #faf8f5;
+  color: #1c1917;
+  background-image: radial-gradient(#e7e5e4 0.75px, transparent 0.75px);
+  background-size: 20px 20px;
+}
+
+.glass-nav {
+  background: rgba(250, 248, 245, 0.88);
+  backdrop-filter: blur(12px);
+}
+
+.card-elevated {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-elevated:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 30px -8px rgba(28, 25, 23, 0.08), 0 4px 12px -4px rgba(194, 65, 12, 0.06);
+}

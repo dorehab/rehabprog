@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DoRehab Indonesia — Panduan Rehabilitasi Cedera Olahraga Berbasis Bukti</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/styles.css" />
+</head>
+<body class="min-h-screen flex flex-col antialiased">
+
+  <!-- Navigasi Atas Sticky -->
+  <header class="sticky top-0 z-30 glass-nav border-b border-stone-200/80">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <button onclick="resetToDirectory()" class="flex items-center gap-3 text-left focus:outline-none group">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-600 to-amber-600 flex items-center justify-center text-white font-extrabold text-lg shadow-sm group-hover:scale-105 transition">
+          DR
+        </div>
+        <div>
+          <span class="font-extrabold text-lg tracking-tight text-stone-900">DoRehab <span class="text-orange-600">ID</span></span>
+          <span class="hidden sm:inline-block text-xs text-stone-500 ml-2 border-l border-stone-300 pl-2">Ilmu Keolahragaan & Fisioterapi Klinis</span>
+        </div>
+      </button>
+
+      <div class="flex items-center gap-2.5">
+        <button id="backBtn" onclick="resetToDirectory()" class="hidden text-xs sm:text-sm font-bold text-stone-700 hover:text-orange-700 px-3.5 py-2 rounded-xl border border-stone-300 hover:border-orange-300 bg-white transition">
+          ← Semua Cedera
+        </button>
+        <button onclick="toggleJsonModal()" class="text-xs font-bold text-indigo-950 hover:bg-indigo-100 px-3.5 py-2 rounded-xl bg-indigo-50 border border-indigo-200/80 transition">
+          { } Data JSON
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Konten Utama -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 sm:py-10">
+
+    <!-- LANGKAH 1 & 2: DIREKTORI CEDERA & PEMILIH DERAJAT -->
+    <section id="directoryView">
+      <div class="bg-indigo-950 text-white rounded-3xl p-7 sm:p-10 mb-8 shadow-lg relative overflow-hidden">
+        <div class="absolute -right-16 -top-16 w-64 h-64 rounded-full bg-orange-600/20 blur-2xl pointer-events-none"></div>
+        <div class="max-w-3xl relative z-10">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-orange-500/20 text-orange-300 border border-orange-400/30 mb-4">
+            Protokol Rehabilitasi 4 Fase • Berbasis Jurnal Internasional
+          </span>
+          <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight mb-3">
+            Direktori Cedera Olahraga & Pemulihan Fungsional
+          </h1>
+          <p class="text-stone-300 text-sm sm:text-base leading-relaxed">
+            Pilih jenis cedera di bawah ini dan tentukan derajat keparahan klinis (Derajat I–III) untuk mengakses definisi anatomi, mekanisme cedera, durasi pemulihan fisioterapi, serta 4 latihan progresif.
+          </p>
+        </div>
+      </div>
+
+      <!-- Pencarian & Filter Regio Anatomi -->
+      <div class="flex flex-col sm:flex-row gap-3 mb-6">
+        <div class="relative flex-1">
+          <input
+            type="text"
+            id="searchInput"
+            oninput="renderDirectory()"
+            placeholder="Cari cedera, otot, sendi, atau ligamen (misal: Hip Subluxation, ACL, Hamstring, HNP)..."
+            class="w-full pl-11 pr-4 py-3 bg-white border border-stone-300 rounded-2xl text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+          />
+          <svg class="w-4 h-4 text-stone-400 absolute left-4 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </div>
+        <select id="regionFilter" onchange="renderDirectory()" class="px-4 py-3 bg-white border border-stone-300 rounded-2xl text-sm font-semibold text-stone-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+          <option value="ALL">Semua Regio Anatomi</option>
+          <option value="Ekstremitas Bawah">Ekstremitas Bawah (Panggul–Kaki)</option>
+          <option value="Ekstremitas Atas">Ekstremitas Atas (Bahu–Siku)</option>
+          <option value="Tulang Belakang">Tulang Belakang (Servikal–Lumbal)</option>
+        </select>
+      </div>
+
+      <!-- Daftar Direktori Cedera -->
+      <div id="injuryList" class="space-y-3.5"></div>
+    </section>
+
+    <!-- TAMPILAN DETAIL: CEDERA & PROTOKOL 4 FASE -->
+    <section id="detailView" class="hidden space-y-8">
+
+      <!-- Kartu Header & Pemilih Derajat -->
+      <div class="bg-white rounded-3xl border border-stone-200 p-6 sm:p-8 shadow-sm">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pb-6 border-b border-stone-100">
+          <div>
+            <div class="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-orange-600 mb-1">
+              <span id="detailRegion">Ekstremitas Bawah</span>
+              <span>•</span>
+              <span id="detailCategory">Cedera Sendi</span>
+            </div>
+            <h2 id="detailTitle" class="text-2xl sm:text-3xl font-extrabold text-stone-900"></h2>
+          </div>
+
+          <!-- Tombol Pemilih Derajat -->
+          <div class="flex flex-wrap gap-2" id="gradeSelectorGroup">
+            <button onclick="selectGrade(1)" id="gradeBtn1" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold border transition">
+              Derajat I • Ringan
+            </button>
+            <button onclick="selectGrade(2)" id="gradeBtn2" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold border transition">
+              Derajat II • Parsial / Sedang
+            </button>
+            <button onclick="selectGrade(3)" id="gradeBtn3" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold border transition">
+              Derajat III • Berat / Total
+            </button>
+          </div>
+        </div>
+
+        <!-- Banner Patologi Derajat -->
+        <div id="gradeBanner" class="mt-6 p-5 rounded-2xl bg-gradient-to-r from-orange-50 to-amber-50/70 border border-orange-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <span class="text-xs font-extrabold uppercase tracking-wider text-orange-800 block" id="gradeLabel">Patologi Derajat I</span>
+            <p class="text-sm text-stone-700 mt-1 leading-relaxed" id="gradeDescription"></p>
+          </div>
+          <div class="shrink-0 bg-white px-4 py-2.5 rounded-xl border border-orange-200 text-right shadow-sm">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-stone-400 block">Estimasi Pemulihan Penuh</span>
+            <span class="text-base font-extrabold text-orange-700" id="gradeTotalTime"></span>
+          </div>
+        </div>
+
+        <!-- 3 Pertanyaan Klinis Inti -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mt-6">
+          <div class="p-4 rounded-2xl bg-stone-50 border border-stone-200/60">
+            <h3 class="text-xs font-extrabold uppercase tracking-wider text-stone-500 mb-1.5">1. Definisi Klinis</h3>
+            <p id="detailDefinition" class="text-sm text-stone-700 leading-relaxed"></p>
+          </div>
+          <div class="p-4 rounded-2xl bg-stone-50 border border-stone-200/60">
+            <h3 class="text-xs font-extrabold uppercase tracking-wider text-stone-500 mb-1.5">2. Mekanisme Cedera</h3>
+            <p id="detailMechanism" class="text-sm text-stone-700 leading-relaxed"></p>
+          </div>
+          <div class="p-4 rounded-2xl bg-stone-50 border border-stone-200/60">
+            <h3 class="text-xs font-extrabold uppercase tracking-wider text-stone-500 mb-1.5">3. Anatomi yang Terkena</h3>
+            <p id="detailAnatomy" class="text-sm text-stone-700 leading-relaxed"></p>
+          </div>
+        </div>
+
+        <!-- Referensi Jurnal Internasional -->
+        <div class="mt-5 pt-4 border-t border-stone-100 flex items-start gap-2 text-xs text-stone-500">
+          <span class="font-bold text-stone-700 shrink-0">Referensi Jurnal:</span>
+          <span id="detailReference"></span>
+        </div>
+      </div>
+
+      <!-- PROGRAM REHABILITASI 4 FASE -->
+      <div>
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-4 gap-2">
+          <div>
+            <h3 class="text-xl font-extrabold text-stone-900">Program Rehabilitasi 4 Fase</h3>
+            <p class="text-sm text-stone-600">Pilih fase rehabilitasi di bawah untuk melihat tujuan fisioterapi, durasi, dan 4 latihan progresif.</p>
+          </div>
+        </div>
+
+        <!-- Tab Navigasi Fase -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6" id="phaseTabs"></div>
+
+        <!-- Konten Fase Aktif & Latihan -->
+        <div id="phaseContent" class="bg-white rounded-3xl border border-stone-200 p-6 sm:p-8 shadow-sm"></div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Modal Inspeksi JSON -->
+  <div id="jsonModal" class="hidden fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[85vh] flex flex-col shadow-2xl border border-stone-200">
+      <div class="px-6 py-4 border-b border-stone-200 flex items-center justify-between">
+        <div>
+          <h3 class="font-extrabold text-stone-900">Database JSON Terstruktur DoRehab Indonesia</h3>
+          <p class="text-xs text-stone-500">Mencakup 9 cedera olahraga (termasuk Subluksasi Sendi Panggul), 3 derajat, dan 144 latihan progresif.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="copyJson()" id="copyJsonBtn" class="text-xs font-bold px-3.5 py-2 rounded-xl bg-orange-600 text-white hover:bg-orange-700 transition">Salin JSON</button>
+          <button onclick="toggleJsonModal()" class="text-stone-400 hover:text-stone-800 p-1.5 text-lg font-bold">✕</button>
+        </div>
+      </div>
+      <pre id="jsonPreview" class="p-6 text-xs font-mono text-stone-700 overflow-auto bg-stone-50 flex-1"></pre>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="border-t border-stone-200/80 bg-white mt-14">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-stone-500">
+      <p><strong>DoRehab Indonesia</strong> — Referensi Edukasi untuk Mahasiswa Ilmu Keolahragaan, Dosen & Fisioterapis.</p>
+      <p>Berbasis Panduan Klinis BJSM, JOSPT & IHPRN • Referensi Latihan: Hep2go</p>
+    </div>
+  </footer>
+
+  <script src="./js/app.js"></script>
+</body>
+</html>
